@@ -12,10 +12,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED On)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(FetchContent)
 
-include(FetchContent)
-FetchContent_Declare(rerun_sdk URL
-    https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip)
-FetchContent_MakeAvailable(rerun_sdk)
+
+FetchContent_Declare(
+   AgIsoStack
+   GIT_REPOSITORY https://github.com/Open-Agriculture/AgIsoStack-plus-plus.git
+   GIT_TAG        main # Replace this with tag or commit hash for better stability
+)
+FetchContent_MakeAvailable(AgIsoStack)
 
 install(
     DIRECTORY config
@@ -34,8 +37,7 @@ install(
 
 
 set(executables
-    rerun
-    visualizer_node
+    agrobus
 )
 
 find_package(ament_cmake REQUIRED)
@@ -110,7 +112,6 @@ find_package(yaml-cpp REQUIRED)
 
 
 set(dependencies_sys
-    rerun_sdk
     fmt::fmt
     ${Boost_LIBRARIES}
     ${OpenCV_LIBS}
@@ -118,25 +119,17 @@ set(dependencies_sys
     ${Eigen_LIBRARIES}
     nlohmann_json::nlohmann_json
     ${YAML_CPP_LIBRARIES}
+    isobus::Isobus
+    isobus::HardwareIntegration
+    isobus::Utility
+    Threads::Threads
 )
-
-set(libraries
-    rerun_ros_interface
-)
-
-foreach(library ${libraries})
-    add_library(${library} lib/${library}.cpp)
-    target_include_directories(${library} PUBLIC include)
-    ament_target_dependencies(${library} ${dependencies_ros})
-    target_link_libraries(${library} ${dependencies_sys})
-endforeach()
 
 foreach(executable ${executables})
     add_executable(${executable} src/${executable}.cpp)
     target_include_directories(${executable} PUBLIC include)
     ament_target_dependencies(${executable} ${dependencies_ros})
     target_link_libraries(${executable} ${dependencies_sys})
-    target_link_libraries(${executable} ${libraries})
     # target_compile_options(${executable} PRIVATE -Wno-unused-parameter)
 endforeach()
 
@@ -144,25 +137,5 @@ install(TARGETS
     ${executables}
     DESTINATION lib/${PROJECT_NAME}
 )
-
-
-# add_library(polygon_tool_plugin SHARED rviz/polygon_tool.cc rviz/polygon_tool.h)
-# ament_target_dependencies(polygon_tool_plugin ${dependencies_ros})
-# target_link_libraries(polygon_tool_plugin ${dependencies_sys})
-
-# install(TARGETS polygon_tool_plugin
-#   DESTINATION lib/polygon_tool_plugin
-# )
-
-# install(FILES plugin_description.xml
-#   DESTINATION share/${PROJECT_NAME}
-# )
-
-# # Install the library
-# install(TARGETS
-#     rviz_polygon_tool_plugin EXPORT
-#     ${PROJECT_NAME}-targets DESTINATION lib)
-# ament_export_targets(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
-# pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
 
 ament_package()
