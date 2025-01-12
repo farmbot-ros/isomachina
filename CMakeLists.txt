@@ -112,6 +112,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 find_package(nlohmann_json REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(Threads REQUIRED)
 
 
 set(dependencies_sys
