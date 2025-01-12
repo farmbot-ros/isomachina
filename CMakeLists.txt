@@ -20,6 +20,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(AgIsoStack)
 
+set(CAN_DRIVER "socketcan")
+set(BUILD_TESTING OFF)
+
 install(
     DIRECTORY config
     DESTINATION share/${PROJECT_NAME}
@@ -123,6 +126,7 @@ set(dependencies_sys
     isobus::HardwareIntegration
     isobus::Utility
     Threads::Threads
+    gcov
 )
 
 foreach(executable ${executables})
